@@ -1,0 +1,6 @@
+<resources>
+    <dimen name="app_bar_height">140dp</dimen>
+    <dimen name="app_bar_divider_top_margin">130dp</dimen>
+    <dimen name="app_bar_divider_horizontal_margin">16dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
+</resources>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">New York News</string>
+    <string name="action_search">Search</string>
+    <string name="top_stories">Top Stories</string>
+    <string name="action_filter">Filter</string>
+    <string name="news_empty">Could not find news</string>
+</resources>
