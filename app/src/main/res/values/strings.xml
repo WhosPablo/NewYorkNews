@@ -3,9 +3,10 @@
     <string name="action_search">Search</string>
     <string name="top_stories">Top Stories</string>
     <string name="action_filter">Filter</string>
-    <string name="news_empty">Could not find news. Try searching or changing your filters.</string>
+    <string name="news_empty">No articles to show!</string>
     <string name="to">To</string>
     <string name="from">From</string>
     <string name="sort_order">Sort Order</string>
     <string name="news_desk_filters">News Desk Filters</string>
+    <string name="news_multimedia">news image</string>
 </resources>

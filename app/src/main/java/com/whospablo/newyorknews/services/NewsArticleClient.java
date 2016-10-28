@@ -68,8 +68,14 @@ public class NewsArticleClient {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
-                handler.onFailure(statusCode, response.toString());
-                Log.d("DEBUG", "fetchNewsArticlesAsync: failed with response JSONObject "+ statusCode);
+                if(response != null ) {
+                    handler.onFailure(statusCode, response.toString());
+                    Log.d("DEBUG", "fetchNewsArticlesAsync: failed with response JSONObject "+ response.toString());
+                } else {
+                    handler.onFailure(statusCode, "no response");
+                    Log.d("DEBUG", "fetchNewsArticlesAsync: failed with no response");
+                }
+
             }
         });
 

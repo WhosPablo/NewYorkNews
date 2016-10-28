@@ -12,26 +12,58 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/card_headline"
+
+        <LinearLayout
+            android:layout_marginBottom="@dimen/card_text_margin"
+            android:id="@+id/card_news_article"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_marginBottom="@dimen/card_text_margin"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:id="@+id/card_news_article_img"
+                android:contentDescription="@string/news_multimedia"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter" />
+
+            <TextView
+                android:id="@+id/card_headline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Title"
+                android:textColor="@color/colorText"
+                android:fontFamily="serif"
+                android:gravity="center_vertical"
+                android:textSize="14sp"
+                android:textStyle="normal|bold" />
+            <TextView
+                android:id="@+id/card_summary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="serif"
+                android:text="This is some really long summary text that should lead to an ellipsis"
+                android:textColor="@color/colorText"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <ImageButton
+            android:layout_marginTop="@dimen/card_text_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Title"
-            android:textColor="@color/colorText"
-            android:fontFamily="serif"
-            android:gravity="center_vertical"
-            android:textSize="14sp"
-            android:textStyle="normal|bold" />
-        <TextView
-            android:id="@+id/card_summary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="serif"
-            android:text="This is some really long summary text that should lead to an ellipsis"
-            android:textColor="@color/colorText"
-            android:ellipsize="end"
-            android:gravity="center_vertical"
-            android:textSize="14sp" />
+            card_view:srcCompat="?attr/actionModeShareDrawable"
+            android:id="@+id/card_share_button"
+            android:background="@android:color/transparent"/>
+
 
     </LinearLayout>
 </android.support.v7.widget.CardView>

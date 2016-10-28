@@ -35,7 +35,10 @@ public class NewsArticle {
             na.headline = jsonObject.getJSONObject("headline").getString("main");
             na.summary = jsonObject.getString("snippet");
             na.webUrl = jsonObject.getString("web_url");
-            na.imgUrl = jsonObject.getString("multimedia");
+
+            JSONArray multimedia = jsonObject.getJSONArray("multimedia");
+            if(multimedia.length()>0)
+                na.imgUrl = multimedia.getJSONObject(multimedia.length()-1).getString("url");
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
@@ -70,6 +73,9 @@ public class NewsArticle {
     }
 
     public String getImgUrl() {
-        return imgUrl;
+        if(imgUrl!=null)
+            return "http://www.nytimes.com/"+imgUrl;
+        else
+            return null;
     }
 }

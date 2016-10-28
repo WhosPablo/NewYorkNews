@@ -13,17 +13,17 @@ The following **required** functionality is completed:
 * [X] User can click on "settings" which allows selection of **advanced search options** to filter results
 * [X] User can configure advanced search filters such as:
   * [X] Begin Date (using a date picker)
-  * [ ] News desk values (Arts, Fashion & Style, Sports)
+  * [X] News desk values (Arts, Fashion & Style, Sports)
   * [X] Sort order (oldest or newest)
 * [X] Subsequent searches have any filters applied to the search results
-* [ ] User can tap on any image in results to see the full text of article **full-screen**
+* [X] User can tap on any image in results to see the full text of article **full-screen**
 * [X] User can **scroll down to see more articles**. The maximum number of articles is limited by the API search.
-* [ ] User can **share an article link** to their friends or email it to themselves
+* [X] User can **share an article link** to their friends or email it to themselves
 
 The following **optional** features are implemented:
 
 * [ ] Improved the user interface and experiment with image assets and/or styling and coloring
-* [ ] Replaced Filter Settings Activity with a lightweight modal overlay
+* [X] Replaced Filter Settings Activity with a lightweight modal overlay
 * [ ] Implements robust error handling, [check if internet is available](http://guides.codepath.com/android/Sending-and-Managing-Network-Requests#checking-for-network-connectivity), handle error cases, network failures
 * [X] Use the [RecyclerView](http://guides.codepath.com/android/Using-the-RecyclerView) with the `StaggeredGridLayoutManager` to display improve the grid of image results
 

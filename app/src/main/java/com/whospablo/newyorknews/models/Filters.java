@@ -32,9 +32,18 @@ public class Filters {
         news_desk_values = new ArrayList<>();
     }
 
-//    public String getNewsDeskValues(){
-//        return news_desk_values[0];
-//    }
+    public String getNewsDeskValuesForParams(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("(");
+        for(String s:news_desk_values){
+            sb.append("\"");
+            sb.append(s);
+            sb.append("\"");
+        }
+        sb.append(")");
+
+        return sb.toString();
+    }
 
 
 }

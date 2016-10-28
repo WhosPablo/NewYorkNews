@@ -1,10 +1,18 @@
 package com.whospablo.newyorknews;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.customtabs.CustomTabsIntent;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -28,12 +36,13 @@ import com.whospablo.newyorknews.util.EndlessRecyclerViewScrollListener;
 
 import org.parceler.Parcels;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class NewsActivity extends AppCompatActivity implements EditFiltersDialogFragment.OnApplyFiltersListener{
+public class NewsActivity extends AppCompatActivity implements EditFiltersDialogFragment.OnApplyFiltersListener, NewsAdapter.NewsArticleItemListener{
 
     private static final String LIST = "list";
     private static final String EXPANDED = "expanded";
@@ -78,13 +87,14 @@ public class NewsActivity extends AppCompatActivity implements EditFiltersDialog
         if(state !=null && state.containsKey(LIST) && state.containsKey(EXPANDED)){
             mAppBarLayout.setExpanded(state.getBoolean(EXPANDED));
             mNewsArticles = Parcels.unwrap(state.getParcelable(LIST));
-            mNewsArticlesRV.setAdapter(new NewsAdapter(this, mNewsArticles));
+            mNewsArticlesRV.setAdapter(new NewsAdapter(this, mNewsArticles, this));
             Log.d("DEBUG", mNewsArticles.toString());
         } else {
             mNewsArticles = new ArrayList<>();
-            mNewsArticlesRV.setAdapter(new NewsAdapter(this, mNewsArticles));
+            mNewsArticlesRV.setAdapter(new NewsAdapter(this, mNewsArticles, this));
             fetchNewsArticlesAsync();
         }
+
     }
 
 
@@ -106,6 +116,8 @@ public class NewsActivity extends AppCompatActivity implements EditFiltersDialog
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
+                mCurrentFilters.query = null;
+                fetchNewsArticlesAsync();
                 return true;
             }
         });
@@ -156,6 +168,18 @@ public class NewsActivity extends AppCompatActivity implements EditFiltersDialog
         if(mNewsArticleClient == null)
             mNewsArticleClient = new NewsArticleClient();
 
+        if(!isOnline() || !isNetworkAvailable()){
+            Snackbar
+                .make(mCoordinatorLayout, "No internet connection!", Snackbar.LENGTH_INDEFINITE)
+                .setAction("Retry", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        fetchNewsArticlesAsync();
+                    }
+                })
+                .show();
+        }
+
         RequestParams params = new RequestParams();
 
         if(mCurrentFilters == null){
@@ -166,6 +190,8 @@ public class NewsActivity extends AppCompatActivity implements EditFiltersDialog
         params.add(Filters.BEGIN_DATE, mCurrentFilters.begin_date);
         params.add(Filters.END_DATE, mCurrentFilters.end_date);
         params.add(Filters.SORT,mCurrentFilters.sort );
+        if(mCurrentFilters.news_desk_values.size() >0)
+            params.add(Filters.NEWS_DESK, mCurrentFilters.getNewsDeskValuesForParams());
 
         mNewsArticleClient.getNewsArticles(params, new NewsArticleClient.ResponseHandler() {
             @Override
@@ -177,14 +203,19 @@ public class NewsActivity extends AppCompatActivity implements EditFiltersDialog
             @Override
             public void onFailure(int statusCode, String response) {
                 Snackbar
-                        .make(mCoordinatorLayout, "Unable to load more articles!", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("RETRY", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                fetchNewsArticlesAsync();
-                            }
-                        })
+                        .make(mCoordinatorLayout, "Loading articles...", Snackbar.LENGTH_LONG)
                         .show();
+
+                Handler handler = new Handler();
+                // Define the code block to be executed
+                Runnable runnableCode = new Runnable() {
+                    @Override
+                    public void run() {
+                        fetchNewsArticlesAsync();
+                    }
+                };
+                // Run the above code block on the main thread after 2 seconds
+                handler.postDelayed(runnableCode, 1000);
             }
         });
 
@@ -192,26 +223,40 @@ public class NewsActivity extends AppCompatActivity implements EditFiltersDialog
     public void fetchMoreNewsArticlesAsync(final int page){
         if(mNewsArticleClient == null)
             fetchNewsArticlesAsync();
-        else
+        else {
+            Snackbar
+                    .make(mCoordinatorLayout, "Loading more articles...", Snackbar.LENGTH_SHORT)
+                    .show();
             mNewsArticleClient.getMoreNewsArticles(page, new NewsArticleClient.ResponseHandler() {
                 @Override
                 public void onSuccess(ArrayList<NewsArticle> newsArticles) {
+                    if (newsArticles.size() < 1)
+                        Snackbar
+                                .make(mCoordinatorLayout, "All out of articles!", Snackbar.LENGTH_SHORT)
+                                .show();
+
                     fetchNewsArticlesAsyncSuccess(newsArticles);
                 }
 
                 @Override
                 public void onFailure(int statusCode, String response) {
                     Snackbar
-                            .make(mCoordinatorLayout, "Unable to load more articles!", Snackbar.LENGTH_INDEFINITE)
-                            .setAction("RETRY", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View view) {
-                                    fetchMoreNewsArticlesAsync(page);
-                                }
-                            })
+                            .make(mCoordinatorLayout, "Loading more articles...", Snackbar.LENGTH_SHORT)
                             .show();
+
+                    Handler handler = new Handler();
+                    // Define the code block to be executed
+                    Runnable runnableCode = new Runnable() {
+                        @Override
+                        public void run() {
+                            fetchMoreNewsArticlesAsync(page);
+                        }
+                    };
+                    // Run the above code block on the main thread after 2 seconds
+                    handler.postDelayed(runnableCode, 1000);
                 }
             });
+        }
     }
 
     private void showFiltersDialog() {
@@ -226,5 +271,46 @@ public class NewsActivity extends AppCompatActivity implements EditFiltersDialog
         this.mCurrentFilters = f;
         fetchNewsArticlesAsync();
 
+    }
+
+    @Override
+    public void onClickNewsArticle(View v, NewsArticle t) {
+        // Use a CustomTabsIntent.Builder to configure CustomTabsIntent.
+        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+        builder.addDefaultShareMenuItem();
+        builder.setToolbarColor(ContextCompat.getColor(this, R.color.colorPrimary));
+
+        // set toolbar color and/or setting custom actions before invoking build()
+        // Once ready, call CustomTabsIntent.Builder.build() to create a CustomTabsIntent
+        CustomTabsIntent customTabsIntent = builder.build();
+        // and launch the desired Url with CustomTabsIntent.launchUrl()
+        customTabsIntent.launchUrl(this, Uri.parse(t.getWebUrl()));
+
+    }
+
+    @Override
+    public void onClickShare(View v, NewsArticle t) {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, t.getWebUrl());
+        startActivity(Intent.createChooser(shareIntent, "Share link using"));
+    }
+
+    private Boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+    }
+
+    public boolean isOnline() {
+        Runtime runtime = Runtime.getRuntime();
+        try {
+            Process ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+            int     exitValue = ipProcess.waitFor();
+            return (exitValue == 0);
+        } catch (IOException e)          { e.printStackTrace(); }
+        catch (InterruptedException e) { e.printStackTrace(); }
+        return false;
     }
 }
