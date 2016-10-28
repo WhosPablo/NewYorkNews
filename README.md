@@ -8,14 +8,14 @@ Time spent: **20** hours spent in total
 
 The following **required** functionality is completed:
 
-* [ ] User can **search for news article** by specifying a query and launching a search. Search displays a grid of image results from the New York Times Search API.
+* [X] User can **search for news article** by specifying a query and launching a search. Search displays a grid of image results from the New York Times Search API.
   * [X] Used the **ActionBar SearchView** or custom layout as the query box
-* [ ] User can click on "settings" which allows selection of **advanced search options** to filter results
-* [ ] User can configure advanced search filters such as:
-  * [ ] Begin Date (using a date picker)
+* [X] User can click on "settings" which allows selection of **advanced search options** to filter results
+* [X] User can configure advanced search filters such as:
+  * [X] Begin Date (using a date picker)
   * [ ] News desk values (Arts, Fashion & Style, Sports)
-  * [ ] Sort order (oldest or newest)
-* [ ] Subsequent searches have any filters applied to the search results
+  * [X] Sort order (oldest or newest)
+* [X] Subsequent searches have any filters applied to the search results
 * [ ] User can tap on any image in results to see the full text of article **full-screen**
 * [X] User can **scroll down to see more articles**. The maximum number of articles is limited by the API search.
 * [ ] User can **share an article link** to their friends or email it to themselves

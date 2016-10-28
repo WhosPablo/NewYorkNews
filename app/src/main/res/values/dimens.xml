@@ -2,5 +2,7 @@
     <dimen name="app_bar_height">140dp</dimen>
     <dimen name="app_bar_divider_top_margin">130dp</dimen>
     <dimen name="app_bar_divider_horizontal_margin">16dp</dimen>
-    <dimen name="text_margin">16dp</dimen>
+    <dimen name="card_text_margin">16dp</dimen>
+    <dimen name="fragment_text_margin">24dp</dimen>
+    <dimen name="fragment_item_margin">8dp</dimen>
 </resources>

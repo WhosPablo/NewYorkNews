@@ -9,9 +9,8 @@
         app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="android.support.v7.widget.SearchView" />
     <item android:id="@+id/action_filter"
-        android:orderInCategory="2"
+        android:orderInCategory="5"
         android:title="@string/action_filter"
         app:showAsAction="always"
-        android:icon="@drawable/ic_filter_list"
-        android:visible="false" />
+        android:icon="@drawable/ic_filter_list" />
 </menu>

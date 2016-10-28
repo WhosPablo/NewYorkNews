@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.percent.PercentRelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="@dimen/fragment_text_margin"
+    android:id="@+id/fragment_view_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="@dimen/fragment_item_margin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_widthPercent="30%"
+        android:text="@string/sort_order"
+        android:id="@+id/sort_order_label" />
+
+    <Spinner
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@id/sort_order_label"
+        android:layout_toEndOf="@id/sort_order_label"
+        android:layout_margin="@dimen/fragment_item_margin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_widthPercent="70%"
+        android:entries="@array/filter_sort_array"
+        android:id="@+id/sort_order_spinner" />
+
+    <TextView
+        android:layout_below="@id/sort_order_spinner"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="@dimen/fragment_item_margin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_widthPercent="30%"
+        android:text="@string/from"
+        android:id="@+id/from_label" />
+
+    <EditText
+        android:layout_below="@+id/sort_order_spinner"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@id/from_label"
+        android:layout_toEndOf="@id/from_label"
+        android:layout_margin="@dimen/fragment_item_margin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_widthPercent="30%"
+        android:inputType="none"
+        android:id="@+id/from_edit_text"
+        android:textSize="14sp" />
+
+    <TextView
+        android:layout_below="@id/from_edit_text"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="@dimen/fragment_item_margin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_widthPercent="30%"
+        android:text="@string/to"
+        android:id="@+id/to_label" />
+
+    <EditText
+        android:layout_below="@+id/from_edit_text"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@id/to_label"
+        android:layout_toEndOf="@id/to_label"
+        android:layout_margin="@dimen/fragment_item_margin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_widthPercent="30%"
+        android:inputType="none"
+        android:id="@+id/to_edit_text"
+        android:textSize="14sp" />
+
+    <TextView
+        android:layout_below="@+id/to_edit_text"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="@dimen/fragment_item_margin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_widthPercent="30%"
+        android:text="@string/news_desk_filters"
+        android:id="@+id/news_desk_label" />
+
+    <com.whospablo.newyorknews.util.MultiSelectionSpinner
+        android:layout_below="@+id/to_edit_text"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@id/news_desk_label"
+        android:layout_toEndOf="@id/news_desk_label"
+        android:layout_margin="@dimen/fragment_item_margin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_widthPercent="70%"
+        android:id="@+id/news_desk_spinner" />
+</android.support.percent.PercentRelativeLayout>

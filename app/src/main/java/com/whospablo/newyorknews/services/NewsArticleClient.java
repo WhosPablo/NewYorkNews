@@ -19,7 +19,7 @@ public class NewsArticleClient {
     private static final String API_BASE_URL = "https://api.nytimes.com/svc/search/v2/";
     private static final String API_KEY = "060f62504b6944278a5ae93095fec036";
     private AsyncHttpClient client;
-    private NewsArticleClientParams currentNewsArticleClientParams;
+    private RequestParams currentNewsArticleClientParams;
 
     public interface ResponseHandler{
         void onSuccess(ArrayList<NewsArticle> newsArticles);
@@ -28,15 +28,14 @@ public class NewsArticleClient {
 
     public NewsArticleClient() {
         this.client = new AsyncHttpClient();
-        this.currentNewsArticleClientParams = new NewsArticleClientParams();
     }
 
     private String getApiUrl(String relativeUrl) {
         return API_BASE_URL + relativeUrl;
     }
 
-    public void getNewsArticles(NewsArticleClientParams newsArticleClientParams, ResponseHandler handler){
-        currentNewsArticleClientParams = newsArticleClientParams == null? new NewsArticleClientParams(): newsArticleClientParams;
+    public void getNewsArticles(RequestParams newsArticleClientParams, ResponseHandler handler){
+        currentNewsArticleClientParams = newsArticleClientParams == null? new RequestParams(): newsArticleClientParams;
         getNewsArticles(0, currentNewsArticleClientParams, handler);
     }
 
@@ -44,20 +43,10 @@ public class NewsArticleClient {
         getNewsArticles(page, currentNewsArticleClientParams, handler);
     }
 
-    private void getNewsArticles(final int page, NewsArticleClientParams newsArticleClientParams, final ResponseHandler handler) {
+    private void getNewsArticles(final int page, RequestParams requestParams, final ResponseHandler handler) {
         String url = getApiUrl("articlesearch.json");
-        RequestParams requestParams = new RequestParams();
-
         requestParams.put("api-key", API_KEY);
-
-        if(newsArticleClientParams.query != null)
-            requestParams.put("q", newsArticleClientParams.query);
-
-        if(newsArticleClientParams.begin_date != null)
-            requestParams.put("begin_date", newsArticleClientParams.begin_date );
-
         requestParams.put("page", page);
-
         client.get(url, requestParams,new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -80,7 +69,7 @@ public class NewsArticleClient {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
                 handler.onFailure(statusCode, response.toString());
-                Log.d("DEBUG", "fetchNewsArticlesAsync: failed with response JSONObject "+ response.toString());
+                Log.d("DEBUG", "fetchNewsArticlesAsync: failed with response JSONObject "+ statusCode);
             }
         });
 

@@ -8,7 +8,7 @@
     android:layout_margin="5dp"
     card_view:cardCornerRadius="2dp">
     <LinearLayout
-        android:padding="@dimen/text_margin"
+        android:layout_margin="@dimen/card_text_margin"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

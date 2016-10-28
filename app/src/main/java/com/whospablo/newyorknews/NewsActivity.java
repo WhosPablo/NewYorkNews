@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,10 +17,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.loopj.android.http.RequestParams;
 import com.whospablo.newyorknews.adapters.NewsAdapter;
+import com.whospablo.newyorknews.fragments.EditFiltersDialogFragment;
+import com.whospablo.newyorknews.models.Filters;
 import com.whospablo.newyorknews.models.NewsArticle;
 import com.whospablo.newyorknews.services.NewsArticleClient;
-import com.whospablo.newyorknews.services.NewsArticleClientParams;
 import com.whospablo.newyorknews.util.EmptyRecyclerView;
 import com.whospablo.newyorknews.util.EndlessRecyclerViewScrollListener;
 
@@ -30,7 +33,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class NewsActivity extends AppCompatActivity{
+public class NewsActivity extends AppCompatActivity implements EditFiltersDialogFragment.OnApplyFiltersListener{
 
     private static final String LIST = "list";
     private static final String EXPANDED = "expanded";
@@ -42,7 +45,7 @@ public class NewsActivity extends AppCompatActivity{
 
     ArrayList<NewsArticle> mNewsArticles;
     NewsArticleClient mNewsArticleClient;
-    NewsArticleClientParams mCurrentSettings;
+    Filters mCurrentFilters;
 
     @Override
     protected void onSaveInstanceState(Bundle state) {
@@ -59,10 +62,6 @@ public class NewsActivity extends AppCompatActivity{
         ButterKnife.bind(this);
 
         setSupportActionBar(mToolbar);
-
-        mCurrentSettings = new NewsArticleClientParams();
-
-
         StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
@@ -84,7 +83,7 @@ public class NewsActivity extends AppCompatActivity{
         } else {
             mNewsArticles = new ArrayList<>();
             mNewsArticlesRV.setAdapter(new NewsAdapter(this, mNewsArticles));
-            fetchNewsArticlesAsync(null);
+            fetchNewsArticlesAsync();
         }
     }
 
@@ -102,13 +101,11 @@ public class NewsActivity extends AppCompatActivity{
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
                 mAppBarLayout.setExpanded(false);
-                filterItem.setVisible(true);
                 return true;
             }
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
-                filterItem.setVisible(false);
                 return true;
             }
         });
@@ -117,8 +114,8 @@ public class NewsActivity extends AppCompatActivity{
             @Override
             public boolean onQueryTextSubmit(String query) {
                 mNewsArticles.clear();
-                mCurrentSettings.query = query;
-                fetchNewsArticlesAsync(mCurrentSettings);
+                mCurrentFilters.query = query;
+                fetchNewsArticlesAsync();
                 // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
                 // see https://code.google.com/p/android/issues/detail?id=24599
                 searchView.clearFocus();
@@ -143,8 +140,7 @@ public class NewsActivity extends AppCompatActivity{
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_filter) {
-
-
+            showFiltersDialog();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -156,12 +152,25 @@ public class NewsActivity extends AppCompatActivity{
     }
 
 
-    public void fetchNewsArticlesAsync(final NewsArticleClientParams newsArticleClientParams){
+    public void fetchNewsArticlesAsync(){
         if(mNewsArticleClient == null)
             mNewsArticleClient = new NewsArticleClient();
-        mNewsArticleClient.getNewsArticles(newsArticleClientParams, new NewsArticleClient.ResponseHandler() {
+
+        RequestParams params = new RequestParams();
+
+        if(mCurrentFilters == null){
+            mCurrentFilters = new Filters();
+        }
+        if(mCurrentFilters.query != null)
+            params.add(Filters.QUERY, mCurrentFilters.query);
+        params.add(Filters.BEGIN_DATE, mCurrentFilters.begin_date);
+        params.add(Filters.END_DATE, mCurrentFilters.end_date);
+        params.add(Filters.SORT,mCurrentFilters.sort );
+
+        mNewsArticleClient.getNewsArticles(params, new NewsArticleClient.ResponseHandler() {
             @Override
             public void onSuccess(ArrayList<NewsArticle> newsArticles) {
+                mNewsArticles.clear();
                 fetchNewsArticlesAsyncSuccess(newsArticles);
             }
 
@@ -172,7 +181,7 @@ public class NewsActivity extends AppCompatActivity{
                         .setAction("RETRY", new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                fetchNewsArticlesAsync(newsArticleClientParams);
+                                fetchNewsArticlesAsync();
                             }
                         })
                         .show();
@@ -182,7 +191,7 @@ public class NewsActivity extends AppCompatActivity{
     }
     public void fetchMoreNewsArticlesAsync(final int page){
         if(mNewsArticleClient == null)
-            fetchNewsArticlesAsync(null);
+            fetchNewsArticlesAsync();
         else
             mNewsArticleClient.getMoreNewsArticles(page, new NewsArticleClient.ResponseHandler() {
                 @Override
@@ -205,5 +214,17 @@ public class NewsActivity extends AppCompatActivity{
             });
     }
 
+    private void showFiltersDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        EditFiltersDialogFragment editFiltersDialogFragment = EditFiltersDialogFragment.newInstance("Filters", mCurrentFilters, this );
+        editFiltersDialogFragment.show(fm, "fragment_edit_name");
+    }
 
+
+    @Override
+    public void applyFilters(Filters f) {
+        this.mCurrentFilters = f;
+        fetchNewsArticlesAsync();
+
+    }
 }
